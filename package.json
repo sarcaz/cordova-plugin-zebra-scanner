@@ -1,7 +1,7 @@
 {
   "name": "cordova-zebra-scanner",
-  "version": "1.0.3",
-  "description": "\n\t\tCordova plugin to interface with Zebra barcode scanners (on Android)\n\t",
+  "version": "2.0.0",
+  "description": "Cordova plugin to interface with Zebra barcode scanners.",
   "cordova": {
     "id": "cordova-zebra-scanner",
     "platforms": [
@@ -10,14 +10,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/michael-may/cordova-zebra-scanner.git"
+    "url": "git+https://github.com/PreciousBiscuit/cordova-zebra-scanner.git"
   },
   "keywords": [
     "barcode",
     "scanner",
     "zebra",
-    "ecosystem:cordova",
-    "cordova-android"
+    "ecosystem:cordova"
   ],
   "engines": [
     {
@@ -25,10 +24,13 @@
       "version": ">=5.0.0"
     }
   ],
-  "author": "Michael May",
+  "author": "Precious Biscuit",
+  "contributors": [
+    "Michael May"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/michael-may/cordova-zebra-scanner/issues"
+    "url": "https://github.com/PreciousBiscuit/cordova-zebra-scanner/issues"
   },
-  "homepage": "https://github.com/michael-may/cordova-zebra-scanner#readme"
+  "homepage": "https://github.com/PreciousBiscuit/cordova-zebra-scanner#readme"
 }
