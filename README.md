@@ -1,4 +1,7 @@
-# Zebra USB Barcode Scanner Plugin for Android
+# Zebra Barcode Scanner Plugin
+
+## Warning: \[2018-08-03\] To be completely changed
+I will be changing the plugin so it could be used over bluetooth.
 
 ## Overview
 This plugin provides a (reasonably) easy-to-use interface for the following supported Zebra USB barcode scanners:
