@@ -31,13 +31,13 @@ This plugin is implemented in `/src/pages/home/`
 ### Cordova CLI
 - From your project directory, run `cordova plugin add cordova-zebra-scanner`.
 ### Manual
-- Copy the plugin to `/plugins/com.michaelmay.cordova.plugin.barcodescanner` in your Cordova-based project.
+- Copy the plugin to `/plugins/com.michaelmay.cordova.plugin.zebrascanner` in your Cordova-based project.
 - (If necessary) Remove and re-add the Android platform to add the plugin to your project.
 
 ## Implementation
 The plugin provides only two methods for you to interface with.
-- cordova.plugins.barcodescanner.attachHandlers
-- cordova.plugins.barcodescanner.connectToScanner
+- cordova.plugins.zebrascanner.attachHandlers
+- cordova.plugins.zebrascanner.connectToScanner
 
 ### Method: attachHandlers(cb): Object
 Used to listen and react to scanner events. Provide a callback function that will handle the different scanner events you want to react to. An Object is passed to the callback.
@@ -47,28 +47,37 @@ This single function is shared in the Java code of the Cordova plugin, so make s
 #### Object Response:
 ```
 {
-	eventType: 'barcodeEvent' | 'scannerPluggedIn' | 'scannerUnplugged' | 'scannerConnected' | 'scannerDisconnected',
-	payload: (barcodeEvent only) {
-		{
-			scannerId: <number>,
-			barcodeType: <string>,
-			barcodeData: <string>
-		}
+	eventType: 'barcodeReceived' | 'scannerFound' | 'scannerLost' | 'scannerConnected' | 'scannerDisconnected',
+	data: (barcodeReceived only) {
+        scannerId: <number>,
+        barcodeType: <string>,
+        barcodeData: <string>
+	}
+	data: (scannerFound only) {
+	    scanner: {
+            id: <number>,
+            name: <string>,
+            model: <string>,
+            serialNumber: <string>
+	    }
+	}
+	data: (scannerLost only) {
+        scannerId: <number>,
 	}
 }
 ```
 
 #### Example:
 ```
-cordova.plugins.barcodescanner.attachHandlers((ev) => {
+cordova.plugins.zebrascanner.attachHandlers((ev) => {
 	switch(ev.eventType) {
-		case 'barcodeEvent':
+		case 'barcodeReceived':
 			// Got a barcode of some sort
 			break;
-		case 'scannerPluggedIn':
+		case 'scannerFound':
 			// Scanner physically plugged in.
 			break;
-		case 'scannerUnplugged':
+		case 'scannerLost':
 			// Scanner physically unplugged.
 			break;
 		case 'scannerConnected':
@@ -108,7 +117,7 @@ Display the barcode somewhere on the screen, and scan it with your scanner to pa
 
 #### Example:
 ```
-cordova.plugins.barcodescanner.connectToScanner((result) => {
+cordova.plugins.zebrascanner.connectToScanner((result) => {
 	switch(result.status) {
 		case 'pairingRequired':
 			// Handle barcode display. Pairing needed before scanning will work.
