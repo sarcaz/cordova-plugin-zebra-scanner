@@ -1,8 +1,8 @@
 let serviceName = 'ZebraScanner'
 
 let zebraScanner = {
-  startScan(successCallback, errorCallback, params) {
-    cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, [params]);
+  startScan(successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
   },
   stopScan(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);

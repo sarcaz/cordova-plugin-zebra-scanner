@@ -18,30 +18,10 @@ import org.json.JSONException;
 
 public class NotificationReceiver extends BroadcastReceiver implements IDcsSdkApiDelegate {
     private static final String TAG = "clZebraScanner";
+    private ZebraScanner mScanner;
 
-    NotificationReceiver() {
-        Log.d(TAG, "Setting up scanner SDK.");
-
-        int notifications_mask = 0;
-        // Subscribe to scanner available/unavailable events
-        notifications_mask |=
-        	DCSSDKDefs.DCSSDK_EVENT.DCSSDK_EVENT_SCANNER_APPEARANCE.value
-        	| DCSSDKDefs.DCSSDK_EVENT.DCSSDK_EVENT_SCANNER_DISAPPEARANCE.value;
-
-        // Subscribe to scanner connection/disconnection events
-        notifications_mask |=
-        	DCSSDKDefs.DCSSDK_EVENT.DCSSDK_EVENT_SESSION_ESTABLISHMENT.value
-        	| DCSSDKDefs.DCSSDK_EVENT.DCSSDK_EVENT_SESSION_TERMINATION.value;
-
-        // Subscribe to barcode events
-        notifications_mask |= DCSSDKDefs.DCSSDK_EVENT.DCSSDK_EVENT_BARCODE.value;
-
-        // ZebraScanner.sdkHandler.dcssdkEnableAvailableScannersDetection(true); TODO move this
-        ZebraScanner.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_SNAPI);
-        ZebraScanner.sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
-        ZebraScanner.sdkHandler.dcssdkSubsribeForEvents(notifications_mask);
-
-        ZebraScanner.sdkHandler.dcssdkSetDelegate(this);
+    NotificationReceiver(ZebraScanner scanner) {
+        mScanner = scanner;
     }
 
     @Override
@@ -52,77 +32,77 @@ public class NotificationReceiver extends BroadcastReceiver implements IDcsSdkAp
 //        int notificationType = intent.getIntExtra("notifications_type", 0);
 
 //        Log.d(TAG, notificationText);
+        Log.d(TAG, "onReceive came !!!");
     }
 
     @Override
     public void dcssdkEventScannerAppeared(DCSScannerInfo scanner) {
-        Log.d(TAG, "GOT DCSScanner Info - Scanner Appeared");
+        Log.d(TAG, "Scanner Appeared");
         try {
-            ZebraScanner.broadcastScannerFound(scanner);
+            mScanner.notifyScannerFound(scanner);
         } catch(JSONException err) {
-            Log.e(TAG, "ERROR broadcasting puggedin event.");
+            Log.e(TAG, "ERROR notifying appeared event.");
         }
     }
 
     @Override
     public void dcssdkEventScannerDisappeared(int scannerId) {
-        // ZebraScanner.sdkHandler.dcssdkTerminateCommunicationSession(scannerId); TODO: move this?
-        Log.d(TAG, "GOT DCSScanner Info - Scanner Disappeared");
+        Log.d(TAG, "Scanner Disappeared");
         try {
-            ZebraScanner.broadcastScannerLost(scannerId);
+            mScanner.notifyScannerLost(scannerId);
         } catch(JSONException err) {
-            Log.e(TAG, "ERROR broadcasting unplugged event.");
+            Log.e(TAG, "ERROR notifying disappeared event.");
         }
     }
 
     @Override
-    public void dcssdkEventCommunicationSessionEstablished(DCSScannerInfo var1) {
-        Log.d(TAG, "GOT DCSScanner Info - Communication Session Established");
+    public void dcssdkEventCommunicationSessionEstablished(DCSScannerInfo scanner) {
+        Log.d(TAG, "Communication Session Established");
         try {
-            ZebraScanner.broadcastScannerConnected();
+            mScanner.notifyScannerConnected();
         } catch(JSONException err) {
-            Log.e(TAG, "ERROR broadcasting connected event.");
+            Log.e(TAG, "ERROR notifying connected event.");
         }
     }
 
     @Override
-    public void dcssdkEventCommunicationSessionTerminated(int var1) {
-        Log.d(TAG, "GOT DCSScanner Info - Communication Session Terminated");
+    public void dcssdkEventCommunicationSessionTerminated(int scannerId) {
+        Log.d(TAG, "Communication Session Terminated");
         try {
-            ZebraScanner.broadcastScannerDisconnected();
+            mScanner.notifyScannerDisconnected(scannerId);
         } catch(JSONException err) {
-            Log.e(TAG, "ERROR broadcasting disconnected event.");
+            Log.e(TAG, "ERROR notifying disconnected event.");
         }
     }
 
     @Override
     public void dcssdkEventBarcode(byte[] barcodeData, int barcodeType, int fromScannerId) {
-        Log.d(TAG, "GOT DCSScanner Info - Got Barcode");
+        Log.d(TAG, "Got Barcode");
         Log.d(TAG, "\nType: " + BarcodeTypes.getBarcodeTypeName(barcodeType) + ".\n From scanner: " + fromScannerId + ".\n Data: " + new String(barcodeData));
         try {
-            ZebraScanner.broadcastBarcodeReceived(new String(barcodeData), BarcodeTypes.getBarcodeTypeName(barcodeType), fromScannerId);
+            mScanner.notifyBarcodeReceived(new String(barcodeData), BarcodeTypes.getBarcodeTypeName(barcodeType), fromScannerId);
         } catch(JSONException err) {
-            Log.e(TAG, "ERROR broadcasting barcode.");
+            Log.e(TAG, "ERROR notifying barcode.");
         }
     }
 
     @Override
     public void dcssdkEventImage(byte[] var1, int var2) {
-        Log.d(TAG, "GOT Image?");
+        Log.d(TAG, "Got Image?");
     }
 
     @Override
     public void dcssdkEventVideo(byte[] var1, int var2) {
-        Log.d(TAG, "GOT DCSScanner Info - Got Video??");
+        Log.d(TAG, "Got Video?");
     }
 
     @Override
     public void dcssdkEventFirmwareUpdate(FirmwareUpdateEvent var1) {
-        Log.d(TAG, "GOT DCSScanner Info - Firmware Update Event");
+        Log.d(TAG, "Firmware Update Event");
     }
 
     @Override
     public void dcssdkEventAuxScannerAppeared(DCSScannerInfo dcsScannerInfo, DCSScannerInfo dcsScannerInfo1) {
-        Log.d(TAG, "GOT DCSScanner Info - Firmware Update Event");
+        Log.d(TAG, "Aux Scanner Appeared");
     }
 }
