@@ -1,13 +1,23 @@
 let serviceName = 'ZebraScanner'
 
 let zebraScanner = {
-  startScan(successCallback, errorCallback) {
+  // NOTE: Zebra has multiple bugs in their SDK so these 2 methods are pointless.
+  // startScan: SDK will start scanning for device immediately after sdkHandler has been created.
+  // stopScan: The scan will be restarted by itself even after stopping it.
+  //           There is no way to stop scanning for devices unless a device is connected or the plugin is destroyed.
+  // startScan(successCallback, errorCallback) {
+  //   cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
+  // },
+  // stopScan(successCallback, errorCallback) {
+  //   cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
+  // },
+  getAvailableDevices(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
   },
-  stopScan(successCallback, errorCallback) {
+  getActiveDevices(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
   },
-  getActiveScanners(successCallback, errorCallback) {
+  getPairingBarcode(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
   },
   connect(successCallback, errorCallback, params) {
@@ -16,8 +26,11 @@ let zebraScanner = {
   disconnect(successCallback, errorCallback, params) {
     cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, [params]);
   },
-  subscribe(successCallback, errorCallback, params) {
-    cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, [params]);
+  subscribe(successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
+  },
+  unsubscribe(successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
   },
 }
 

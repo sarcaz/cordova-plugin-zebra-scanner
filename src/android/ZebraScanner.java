@@ -1,7 +1,6 @@
 package land.cookie.cordova.plugin.zebrascanner;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.io.ByteArrayOutputStream;
 
@@ -20,7 +19,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.google.gson.JsonObject;
 import com.zebra.scannercontrol.SDKHandler;
 import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.DCSScannerInfo;
@@ -31,13 +29,10 @@ public class ZebraScanner extends CordovaPlugin {
 
     private SDKHandler sdkHandler; // Zebra SDK
     private NotificationReceiver notificationReceiver;
-    private CallbackContext eventEmitter;
     private CallbackContext scanCallBack;
-
-    // Barcode scanner stuff
-    private static ArrayList<DCSScannerInfo> mSNAPIList = new ArrayList<DCSScannerInfo>();
-    private static ArrayList<DCSScannerInfo> mScannerInfoList = new ArrayList<DCSScannerInfo>();
-//    private static HashMap<int, Object>
+    // SDK does not support multiple connected devices.
+    private CallbackContext connectionCallBack;
+    private CallbackContext subscriptionCallback;
 
     @Override
     public boolean execute (
@@ -50,63 +45,27 @@ public class ZebraScanner extends CordovaPlugin {
             startScanAction(callbackContext);
         else if ("stopScan".equals(action))
             stopScanAction(callbackContext);
-        else if ("getActiveScanners".equals(action))
-            getActiveScannersAction();
+        else if ("getAvailableDevices".equals(action))
+            getAvailableDevicesAction(callbackContext);
+        else if ("getActiveDevices".equals(action))
+            getActiveDevicesAction(callbackContext);
+        else if ("getPairingBarcode".equals(action))
+            getPairingBarcodeAction(callbackContext);
         else if ("connect".equals(action))
             connectAction(args, callbackContext);
         else if ("disconnect".equals(action))
             disconnectAction(args, callbackContext);
         else if ("subscribe".equals(action))
-            subscribeAction(args, callbackContext);
+            subscribeAction(callbackContext);
+        else if ("unsubscribe".equals(action))
+            unsubscribeAction(callbackContext);
         else
             return false;
-
-        // Checks to see if a scanner is connected or not.
-//        if (action.equalsIgnoreCase("getScannerInfo")) {
-//            final int scannerIndex;
-//            if (!args.isNull(0)) {
-//                scannerIndex = args.getInt(0);
-//            } else {
-//                scannerIndex = 0;
-//            }
-//
-//            cordova.getActivity().runOnUiThread(new Runnable() {
-//                public void run() {
-//                    if (sdkHandler == null) {
-//                        init();
-//                    }
-//
-//                    try {
-//                        JSONObject result = getScannerInfo(scannerIndex);
-//
-//                        callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.OK, result));
-//                    } catch(JSONException err) {
-//                        Log.e(TAG, "ERROR sending scanner info response.");
-//                    }
-//                }
-//            });
-//            return true;
-//        }
-//
-//        // Create a reusable callback context for the native event handlers.
-//        if (action.equalsIgnoreCase("handleEvents")) {
-//            eventEmitter = callbackContext;
-//            return true;
-//        }
-
         return true;
     }
 
-    @Override
-    public void onDestroy() {
-        notificationReceiver = null;
-        sdkHandler = null;
-
-        super.onDestroy();
-    }
-
     private void init() {
-        Log.d(TAG, "Setting up scanner SDK.");
+        Log.d(TAG, "Setting up Zebra SDK.");
         sdkHandler = new SDKHandler(this.cordova.getActivity().getApplicationContext());
         notificationReceiver = new NotificationReceiver(this);
 
@@ -119,31 +78,37 @@ public class ZebraScanner extends CordovaPlugin {
                 | DCSSDKDefs.DCSSDK_EVENT.DCSSDK_EVENT_SESSION_ESTABLISHMENT.value
                 | DCSSDKDefs.DCSSDK_EVENT.DCSSDK_EVENT_SESSION_TERMINATION.value;
 
-        sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_SNAPI);
-        sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
         sdkHandler.dcssdkSubsribeForEvents(notifications_mask);
         sdkHandler.dcssdkSetDelegate(notificationReceiver);
+        sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
+        // Warning: This argument does nothing
+//        sdkHandler.dcssdkEnableAvailableScannersDetection(true);
     }
 
+    // There is a bug in Zebra SDK so this method is pointless for now.
     private void startScanAction(CallbackContext callbackContext) throws JSONException {
         if (scanCallBack != null) {
             callbackContext.error("Scanning is already in a progress.");
             return;
         }
-        sdkHandler.dcssdkEnableAvailableScannersDetection(true);
+
+        Log.d(TAG, "Starting scan.");
+        sdkHandler.dcssdkStartScanForAvailableDevices();
 
         scanCallBack = callbackContext;
         PluginResult message = createStatusMessage("scanStart", true);
         scanCallBack.sendPluginResult(message);
     }
 
+    // There is a bug in Zebra SDK so this method is pointless for now.
     private void stopScanAction(CallbackContext callbackContext) throws JSONException {
         if (scanCallBack == null) {
             callbackContext.error("Scanning was not in a progress.");
             return;
         }
 
-        sdkHandler.dcssdkEnableAvailableScannersDetection(false);
+        Log.d(TAG, "Stopping scan.");
+        sdkHandler.dcssdkStopScanningDevices();
 
         callbackContext.success("Scanning was stopped.");
         PluginResult message = createStatusMessage("scanStop", false);
@@ -151,156 +116,200 @@ public class ZebraScanner extends CordovaPlugin {
         scanCallBack = null;
     }
 
-    private void getActiveScannersAction() {
+    private void getAvailableDevicesAction(CallbackContext callbackContext) throws JSONException {
+        List<DCSScannerInfo> deviceInfos = new ArrayList<DCSScannerInfo>();
+        sdkHandler.dcssdkGetAvailableScannersList(deviceInfos);
 
+        JSONArray devices = new JSONArray();
+        for (DCSScannerInfo deviceInfo : deviceInfos) {
+            devices.put(createScannerDevice(deviceInfo));
+        }
+        callbackContext.success(devices);
     }
 
-    private void connectAction(JSONArray args, CallbackContext callbackContext) {
+    private void getActiveDevicesAction(CallbackContext callbackContext) throws JSONException {
+        List<DCSScannerInfo> deviceInfos = new ArrayList<DCSScannerInfo>();
+        sdkHandler.dcssdkGetActiveScannersList(deviceInfos);
 
+        JSONArray devices = new JSONArray();
+        for (DCSScannerInfo deviceInfo : deviceInfos) {
+            devices.put(createScannerDevice(deviceInfo));
+        }
+        callbackContext.success(devices);
     }
 
-    private void disconnectAction(JSONArray args, CallbackContext callbackContext) {
-//        sdkHandler.dcssdkTerminateCommunicationSession();
+    private void getPairingBarcodeAction(CallbackContext callbackContext) {
+        String barcode = getSnapiBarcode();
+        callbackContext.success(barcode);
     }
 
-    private void subscribeAction(JSONArray args, CallbackContext callbackContext) {
+    private void connectAction(JSONArray params, CallbackContext callbackContext) {
+        JSONObject param = params.optJSONObject(0);
+        if (param == null) {
+            callbackContext.error("Missing parameter");
+            return;
+        }
+        int deviceId = param.optInt("deviceId"); // TODO:
+        if (deviceId == 0) {
+            callbackContext.error("Invalid parameter - deviceId");
+            return;
+        }
 
+        Log.d(TAG, "Connecting to scanner " + deviceId + ".");
+        DCSSDKDefs.DCSSDK_RESULT result = sdkHandler.dcssdkEstablishCommunicationSession(deviceId);
+
+        if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SUCCESS) {
+            connectionCallBack = callbackContext;
+        }
+        else {
+            if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_NOT_AVAILABLE)
+                callbackContext.error("Scanner " + deviceId + " is not available.");
+            else if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_ALREADY_ACTIVE)
+                callbackContext.error("Already connected to scanner " + deviceId + ".");
+            else
+                callbackContext.error("Unable to connect to scanner " + deviceId + ".");
+            Log.d(TAG, "Connection to scanner " + deviceId + " failed.");
+        }
     }
 
-    public void notifyScannerFound(DCSScannerInfo scannerInfo) throws JSONException {
+    private void disconnectAction(JSONArray params, CallbackContext callbackContext) {
+        JSONObject param = params.optJSONObject(0);
+        if (param == null) {
+            callbackContext.error("Missing parameter");
+            return;
+        }
+        int deviceId = param.optInt("deviceId");
+        if (deviceId == 0) {
+            callbackContext.error("Invalid parameter - deviceId");
+            return;
+        }
+
+        Log.d(TAG, "Disconnecting from scanner " + deviceId + ".");
+        DCSSDKDefs.DCSSDK_RESULT result = sdkHandler.dcssdkTerminateCommunicationSession(deviceId);
+
+        if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SUCCESS) {
+            callbackContext.success("ok");
+        }
+        else {
+            if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_NOT_AVAILABLE)
+                callbackContext.error("Scanner " + deviceId + " is not available.");
+            else if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_NOT_ACTIVE)
+                callbackContext.error("Never connected to scanner " + deviceId + ".");
+            else
+                callbackContext.error("Unable to disconnect from scanner " + deviceId + ".");
+            Log.d(TAG, "Connection to scanner " + deviceId + " failed.");
+        }
+    }
+
+    private void subscribeAction(CallbackContext callbackContext) {
+        if (connectionCallBack == null) {
+            callbackContext.error("No connected scanner");
+            return;
+        }
+
+        subscriptionCallback = callbackContext;
+    }
+
+    private void unsubscribeAction(CallbackContext callbackContext) {
+        if (subscriptionCallback == null) {
+            callbackContext.error("No active subscription");
+            return;
+        }
+
+        subscriptionCallback = null;
+    }
+
+    public void notifyDeviceFound(DCSScannerInfo deviceInfo) throws JSONException {
         if (scanCallBack == null)
             return;
 
-        JSONObject scanner = new JSONObject();
-        scanner.put("id", scannerInfo.getScannerID());
-        scanner.put("name", scannerInfo.getScannerName());
-        scanner.put("model", scannerInfo.getScannerModel());
-        scanner.put("serialNumber", scannerInfo.getScannerHWSerialNumber());
+        JSONObject device = createScannerDevice(deviceInfo);
 
-        PluginResult message = createStatusMessage("scannerFound","scanner", scanner, true);
+        PluginResult message = createStatusMessage("deviceFound","device", device, true);
         scanCallBack.sendPluginResult(message);
     }
 
-    // Not exactly sure if this is a correct callback. TODO: test if possible
-    public void notifyScannerLost(int scannerId) throws JSONException {
+    public void notifyDeviceLost(int deviceId) throws JSONException {
         if (scanCallBack == null)
             return;
 
-        JSONObject scanner = new JSONObject();
-        scanner.put("id", scannerId);
+        JSONObject device = new JSONObject();
+        device.put("id", deviceId);
 
-        PluginResult message = createStatusMessage("scannerLost","scanner", scanner, true);
+        PluginResult message = createStatusMessage("deviceLost","device", device, true);
         scanCallBack.sendPluginResult(message);
     }
 
-    public void notifyScannerConnected() throws JSONException {
-        if (eventEmitter == null)
+    public void notifyDeviceConnected(DCSScannerInfo deviceInfo) throws JSONException {
+        if (connectionCallBack == null)
             return;
 
-        JSONObject result = new JSONObject();
+        JSONObject device = new JSONObject();
+        device.put("id", deviceInfo.getScannerID());
 
-        result.put("eventType", "scannerConnected");
-
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-        pluginResult.setKeepCallback(true);
-        eventEmitter.sendPluginResult(pluginResult);
+        PluginResult message = createStatusMessage("connected", "device", device, true);
+        connectionCallBack.sendPluginResult(message);
+        Log.d(TAG, "Connection to scanner " + deviceInfo.getScannerID() + " was successful.");
     }
 
-    public void notifyScannerDisconnected(int scannerId) throws JSONException {
-        if (eventEmitter == null)
+    public void notifyDeviceDisconnected(int deviceId) throws JSONException {
+        if (connectionCallBack == null)
             return;
 
-        JSONObject result = new JSONObject();
-        JSONObject data = new JSONObject();
+        JSONObject device = new JSONObject();
+        device.put("id", deviceId);
 
-        data.put("scannerId", scannerId);
-
-        result.put("data", data);
-        result.put("eventType", "scannerDisconnected");
-
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-        pluginResult.setKeepCallback(true);
-        eventEmitter.sendPluginResult(pluginResult);
+        PluginResult message = createStatusMessage("disconnected", "device", device, false);
+        connectionCallBack.sendPluginResult(message);
+        connectionCallBack = null;
+        subscriptionCallback = null;
+        Log.d(TAG, "Scanner " + deviceId + " was disconnected.");
     }
 
     public void notifyBarcodeReceived(String barcodeData, String barcodeType, int fromScannerId) throws JSONException {
-        if (eventEmitter == null)
+        if (subscriptionCallback == null)
             return;
 
-        JSONObject result = new JSONObject();
         JSONObject data = new JSONObject();
+        data.put("deviceId", fromScannerId);
 
-        data.put("scannerId", fromScannerId);
-        data.put("barcodeType", barcodeType);
-        data.put("barcodeData", barcodeData);
+        JSONObject barcode = new JSONObject();
+        barcode.put("type", barcodeType);
+        barcode.put("data", barcodeData);
+        data.put("barcode", barcode);
 
-        result.put("data", data);
-        result.put("eventType", "barcodeReceived");
-
-        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
-        pluginResult.setKeepCallback(true);
-        eventEmitter.sendPluginResult(pluginResult);
+        PluginResult message = new PluginResult(PluginResult.Status.OK, data);
+        message.setKeepCallback(true);
+        subscriptionCallback.sendPluginResult(message);
     }
 
-    // Attempts to get connected USB scanner info.
-    // If one is not found, send a pairing barcode (base64 encoded JPEG) back to client.
-    public JSONObject getScannerInfo(int idx) throws JSONException {
-        // USB Scanner detection
-        mSNAPIList.clear();
-        updateScannerList();
-        for (DCSScannerInfo device:getActualScannersList()) {
-            if (device.getConnectionType() == DCSSDKDefs.DCSSDK_CONN_TYPES.DCSSDK_CONNTYPE_USB_SNAPI) {
-                mSNAPIList.add(device);
-                Log.d(TAG, "--------FOUND USB SCANNER--------");
-            }
+    private PluginResult createStatusMessage(String status, boolean keepCallback) throws JSONException {
+        return createStatusMessage(status, null, null, keepCallback);
+    }
+
+    private PluginResult createStatusMessage(String status, String dataKey, JSONObject data, boolean keepCallback)
+            throws JSONException {
+        JSONObject msgData = new JSONObject();
+        msgData.put("status", status);
+
+        if (dataKey != null && !dataKey.isEmpty() && data != null) {
+            msgData.put(dataKey, data);
         }
 
-        // If no scanners, we need to send a pairing barcode
-        // Else attach the requested or default scanner.
-        if (mSNAPIList.size() == 0) {
-            Log.d(TAG, "No USB scanners found");
-            String connectionBarcode = getSnapiBarcode();
-
-            JSONObject result = new JSONObject();
-            result.put("status", "pairingRequired");
-            result.put("connectionBarcode", connectionBarcode);
-
-            return result;
-        } else {
-            Log.d(TAG, mSNAPIList.size() + " scanners found");
-
-            if (idx + 1 > mSNAPIList.size()) {
-                idx = 0;
-            }
-
-            int scannerId = mSNAPIList.get(idx).getScannerID();
-
-            sdkHandler.dcssdkEstablishCommunicationSession(scannerId);
-
-            JSONObject result = new JSONObject();
-
-            result.put("status", "paired");
-            result.put("message", "Paired to scanner: " + scannerId);
-
-            return result;
-        }
+        PluginResult message = new PluginResult(PluginResult.Status.OK, msgData);
+        message.setKeepCallback(keepCallback);
+        return message;
     }
 
-    private void updateScannerList() {
-        if (sdkHandler != null) {
-            mScannerInfoList.clear();
-            sdkHandler.dcssdkGetAvailableScannersList(mScannerInfoList);
-            sdkHandler.dcssdkGetActiveScannersList(mScannerInfoList);
-        }
+    private JSONObject createScannerDevice(DCSScannerInfo scanner) throws JSONException {
+        JSONObject device = new JSONObject();
+        device.put("id", scanner.getScannerID());
+        device.put("name", scanner.getScannerName());
+        device.put("model", scanner.getScannerModel());
+        device.put("serialNumber", scanner.getScannerHWSerialNumber());
+        return device;
     }
 
-    private List<DCSScannerInfo> getActualScannersList() {
-        return mScannerInfoList;
-    }
-
-    // The official docs have this display a native view
-    // with the barcode. Here we prefer to send the code back
-    // to JS to deal with.
     private String getSnapiBarcode() {
         BarCodeView barCodeView = sdkHandler.dcssdkGetUSBSNAPIWithImagingBarcode();
         barCodeView.setSize(500, 100);
@@ -329,23 +338,5 @@ public class ZebraScanner extends CordovaPlugin {
         ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
         image.compress(format, quality, byteArrayStream);
         return Base64.encodeToString(byteArrayStream.toByteArray(), Base64.DEFAULT);
-    }
-
-    private PluginResult createStatusMessage(String status, boolean keepCallback) throws JSONException {
-        return createStatusMessage(status, null, null, keepCallback);
-    }
-
-    private PluginResult createStatusMessage(String status, String dataKey, JSONObject data, boolean keepCallback)
-            throws JSONException {
-        JSONObject msgData = new JSONObject();
-        msgData.put("status", status);
-
-        if (dataKey != null && !dataKey.isEmpty() && data != null) {
-            msgData.put(dataKey, data);
-        }
-
-        PluginResult message = new PluginResult(PluginResult.Status.OK, msgData);
-        message.setKeepCallback(keepCallback);
-        return message;
     }
 }

@@ -23,7 +23,7 @@
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/widget">
       <feature name="ZebraScanner">
-        <param name="android-package" value="land.cookie.cordova.plugin.zebrascanner" />
+        <param name="android-package" value="land.cookie.cordova.plugin.zebrascanner.ZebraScanner" />
       </feature>
     </config-file>
 
@@ -41,7 +41,5 @@
                  target-dir="src/land/cookie/cordova/plugin/zebrascanner" />
     <source-file src="src/android/barcode/BarcodeTypes.java"
                  target-dir="src/land/cookie/cordova/plugin/zebrascanner/barcode" />
-    <source-file src="src/android/Constants.java"
-                 target-dir="src/land/cookie/cordova/plugin/zebrascanner" />
   </platform>
 </plugin>

@@ -1,13 +1,11 @@
 package land.cookie.cordova.plugin.zebrascanner;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
 import android.util.Log;
 
-import com.zebra.scannercontrol.DCSSDKDefs;
 import com.zebra.scannercontrol.DCSScannerInfo;
 import com.zebra.scannercontrol.FirmwareUpdateEvent;
 import com.zebra.scannercontrol.IDcsSdkApiDelegate;
@@ -39,7 +37,7 @@ public class NotificationReceiver extends BroadcastReceiver implements IDcsSdkAp
     public void dcssdkEventScannerAppeared(DCSScannerInfo scanner) {
         Log.d(TAG, "Scanner Appeared");
         try {
-            mScanner.notifyScannerFound(scanner);
+            mScanner.notifyDeviceFound(scanner);
         } catch(JSONException err) {
             Log.e(TAG, "ERROR notifying appeared event.");
         }
@@ -49,7 +47,7 @@ public class NotificationReceiver extends BroadcastReceiver implements IDcsSdkAp
     public void dcssdkEventScannerDisappeared(int scannerId) {
         Log.d(TAG, "Scanner Disappeared");
         try {
-            mScanner.notifyScannerLost(scannerId);
+            mScanner.notifyDeviceLost(scannerId);
         } catch(JSONException err) {
             Log.e(TAG, "ERROR notifying disappeared event.");
         }
@@ -59,7 +57,7 @@ public class NotificationReceiver extends BroadcastReceiver implements IDcsSdkAp
     public void dcssdkEventCommunicationSessionEstablished(DCSScannerInfo scanner) {
         Log.d(TAG, "Communication Session Established");
         try {
-            mScanner.notifyScannerConnected();
+            mScanner.notifyDeviceConnected(scanner);
         } catch(JSONException err) {
             Log.e(TAG, "ERROR notifying connected event.");
         }
@@ -69,7 +67,7 @@ public class NotificationReceiver extends BroadcastReceiver implements IDcsSdkAp
     public void dcssdkEventCommunicationSessionTerminated(int scannerId) {
         Log.d(TAG, "Communication Session Terminated");
         try {
-            mScanner.notifyScannerDisconnected(scannerId);
+            mScanner.notifyDeviceDisconnected(scannerId);
         } catch(JSONException err) {
             Log.e(TAG, "ERROR notifying disconnected event.");
         }
