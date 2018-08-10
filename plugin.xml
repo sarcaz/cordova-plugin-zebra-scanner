@@ -9,8 +9,8 @@
   <author>Precious Biscuit</author>
   <license>MIT</license>
   <keywords>barcode, scanner, zebra</keywords>
-  <repo>https://github.com/PreciousBiscuit/cordova-zebra-scanner.git</repo>
-  <issue>https://github.com/PreciousBiscuit/cordova-zebra-scanner/issues</issue>
+  <repo>https://github.com/PreciousBiscuit/cordova-plugin-zebra-scanner.git</repo>
+  <issue>https://github.com/PreciousBiscuit/cordova-plugin-zebra-scanner/issues</issue>
 
   <engines>
     <engine name="cordova" version=">=5.0.0" />
