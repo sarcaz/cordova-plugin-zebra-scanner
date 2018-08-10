@@ -7,16 +7,16 @@ because I only have RFD8500 rfid/barcode scanner which works over bluetooth
 (Connecting to rfid part of RFD8500 is done over bluetooth-serial plugin).
 
 ## Overview
-This plugin should support these Zebra bluetooth barcode scanners:
+These bluetooth barcode scanners are supported:
 ```
-• CS4070 (in Bluetooth SSI Profile mode)
-• LI4278 (in SSI Host Server mode or Cradle Host mode by scanning pairing bar code)
-• DS6878 (in SSI Host Server mode or Cradle Host mode by scanning pairing bar code)
+• CS4070
+• LI4278
+• DS6878
 • RFD8500 (Tested)
-• DS3678 (In SSI BT Classic mode)
-• LI3678 (In SSI BT Classic mode)
+• DS3678
+• LI3678
 ```
-These USB scanner should be supported as well, however I cannot test it:
+These USB barcode scanners should be supported as well, however I cannot test it:
 ```
 • PL3307
 • DS457
