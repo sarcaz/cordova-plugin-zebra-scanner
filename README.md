@@ -19,7 +19,7 @@ This plugin should support these Zebra bluetooth barcode scanners:
 These USB scanner should be supported as well, however I cannot test it:
 ```
 • PL3307
-• DS457 (Tested)
+• DS457
 • DS4308
 • LS2208
 • DS6878 and Presentation Cradle
