@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/PreciousBiscuit/cordova-zebra-scanner.git"
+    "url": "git+https://github.com/PreciousBiscuit/cordova-plugin-zebra-scanner.git"
   },
   "keywords": [
     "barcode",
@@ -30,7 +30,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/PreciousBiscuit/cordova-zebra-scanner/issues"
+    "url": "https://github.com/PreciousBiscuit/cordova-plugin-zebra-scanner/issues"
   },
-  "homepage": "https://github.com/PreciousBiscuit/cordova-zebra-scanner#readme"
+  "homepage": "https://github.com/PreciousBiscuit/cordova-plugin-zebra-scanner#readme"
 }
