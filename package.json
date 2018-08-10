@@ -3,7 +3,7 @@
   "version": "2.0.0",
   "description": "Cordova plugin to interface with Zebra barcode scanners.",
   "cordova": {
-    "id": "cordova-zebra-scanner",
+    "id": "cordova-plugin-zebra-scanner",
     "platforms": [
       "android"
     ]
