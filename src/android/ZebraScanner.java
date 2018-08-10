@@ -80,12 +80,10 @@ public class ZebraScanner extends CordovaPlugin {
 
         sdkHandler.dcssdkSubsribeForEvents(notifications_mask);
         sdkHandler.dcssdkSetDelegate(notificationReceiver);
+        sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_SNAPI);
         sdkHandler.dcssdkSetOperationalMode(DCSSDKDefs.DCSSDK_MODE.DCSSDK_OPMODE_BT_NORMAL);
-        // Warning: This argument does nothing
-//        sdkHandler.dcssdkEnableAvailableScannersDetection(true);
     }
 
-    // There is a bug in Zebra SDK so this method is pointless for now.
     private void startScanAction(CallbackContext callbackContext) throws JSONException {
         if (scanCallBack != null) {
             callbackContext.error("Scanning is already in a progress.");
@@ -98,9 +96,16 @@ public class ZebraScanner extends CordovaPlugin {
         scanCallBack = callbackContext;
         PluginResult message = createStatusMessage("scanStart", true);
         scanCallBack.sendPluginResult(message);
+
+        List<DCSScannerInfo> deviceInfos = new ArrayList<DCSScannerInfo>();
+        sdkHandler.dcssdkGetAvailableScannersList(deviceInfos);
+
+        for (DCSScannerInfo deviceInfo : deviceInfos) {
+            notifyDeviceFound(deviceInfo);
+        }
     }
 
-    // There is a bug in Zebra SDK so this method is pointless for now.
+    // There is a bug in Zebra SDK so this method is pointless.
     private void stopScanAction(CallbackContext callbackContext) throws JSONException {
         if (scanCallBack == null) {
             callbackContext.error("Scanning was not in a progress.");
@@ -149,7 +154,7 @@ public class ZebraScanner extends CordovaPlugin {
             callbackContext.error("Missing parameter");
             return;
         }
-        int deviceId = param.optInt("deviceId"); // TODO:
+        int deviceId = param.optInt("deviceId");
         if (deviceId == 0) {
             callbackContext.error("Invalid parameter - deviceId");
             return;

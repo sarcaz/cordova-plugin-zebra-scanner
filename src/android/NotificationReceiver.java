@@ -1,9 +1,5 @@
 package land.cookie.cordova.plugin.zebrascanner;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-
 import android.util.Log;
 
 import com.zebra.scannercontrol.DCSScannerInfo;
@@ -14,23 +10,12 @@ import land.cookie.cordova.plugin.zebrascanner.barcode.BarcodeTypes;
 
 import org.json.JSONException;
 
-public class NotificationReceiver extends BroadcastReceiver implements IDcsSdkApiDelegate {
+public class NotificationReceiver implements IDcsSdkApiDelegate {
     private static final String TAG = "clZebraScanner";
     private ZebraScanner mScanner;
 
     NotificationReceiver(ZebraScanner scanner) {
         mScanner = scanner;
-    }
-
-    @Override
-    public void onReceive(Context context, Intent intent) { // TODO: delete?
-//        NotificationManager mgr = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-//        String notificationText = intent.getStringExtra("notifications_text");
-//        int notificationType = intent.getIntExtra("notifications_type", 0);
-
-//        Log.d(TAG, notificationText);
-        Log.d(TAG, "onReceive came !!!");
     }
 
     @Override

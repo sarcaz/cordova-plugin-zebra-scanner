@@ -1,16 +1,18 @@
 let serviceName = 'ZebraScanner'
 
 let zebraScanner = {
-  // NOTE: Zebra has multiple bugs in their SDK so these 2 methods are pointless.
-  // startScan: SDK will start scanning for device immediately after sdkHandler has been created.
-  // stopScan: The scan will be restarted by itself even after stopping it.
-  //           There is no way to stop scanning for devices unless a device is connected or the plugin is destroyed.
-  // startScan(successCallback, errorCallback) {
-  //   cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
-  // },
-  // stopScan(successCallback, errorCallback) {
-  //   cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
-  // },
+  // NOTE: Zebra has multiple bugs in their SDK so these 2 methods does not need to be used.
+
+  // SDK will start scanning for device immediately after sdkHandler has been created.
+  // That means the scanning will start after calling any of these methods.
+  startScan(successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
+  },
+  // The scan will be restarted by itself even after stopping it.
+  // There is no way to stop scanning for devices unless a device is connected or the plugin is destroyed.
+  stopScan(successCallback, errorCallback) {
+    cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
+  },
   getAvailableDevices(successCallback, errorCallback) {
     cordova.exec(successCallback, errorCallback, serviceName, arguments.callee.name, []);
   },
