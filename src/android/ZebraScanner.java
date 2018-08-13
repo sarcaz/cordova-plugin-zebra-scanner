@@ -25,7 +25,7 @@ import com.zebra.scannercontrol.DCSScannerInfo;
 import com.zebra.scannercontrol.BarCodeView;
 
 public class ZebraScanner extends CordovaPlugin {
-    private static final String TAG = "clZebraScanner";
+    private static final String TAG = "CL_ZebraScanner";
 
     private SDKHandler sdkHandler; // Zebra SDK
     private NotificationReceiver notificationReceiver;
@@ -160,11 +160,16 @@ public class ZebraScanner extends CordovaPlugin {
             return;
         }
 
-        Log.d(TAG, "Connecting to scanner " + deviceId + ".");
         DCSSDKDefs.DCSSDK_RESULT result = sdkHandler.dcssdkEstablishCommunicationSession(deviceId);
 
         if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SUCCESS) {
             connectionCallBack = callbackContext;
+
+            JSONObject device = new JSONObject();
+            device.put("id", deviceId);
+
+            PluginResult message = createStatusMessage("connected", "device", device, true);
+            connectionCallBack.sendPluginResult(message);
         }
         else {
             if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_NOT_AVAILABLE)
@@ -189,7 +194,6 @@ public class ZebraScanner extends CordovaPlugin {
             return;
         }
 
-        Log.d(TAG, "Disconnecting from scanner " + deviceId + ".");
         DCSSDKDefs.DCSSDK_RESULT result = sdkHandler.dcssdkTerminateCommunicationSession(deviceId);
 
         if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SUCCESS) {
@@ -222,6 +226,7 @@ public class ZebraScanner extends CordovaPlugin {
         }
 
         subscriptionCallback = null;
+        callbackContext.success("ok");
     }
 
     public void notifyDeviceFound(DCSScannerInfo deviceInfo) throws JSONException {
@@ -245,17 +250,10 @@ public class ZebraScanner extends CordovaPlugin {
         scanCallBack.sendPluginResult(message);
     }
 
-    public void notifyDeviceConnected(DCSScannerInfo deviceInfo) throws JSONException {
-        if (connectionCallBack == null)
-            return;
-
-        JSONObject device = new JSONObject();
-        device.put("id", deviceInfo.getScannerID());
-
-        PluginResult message = createStatusMessage("connected", "device", device, true);
-        connectionCallBack.sendPluginResult(message);
-        Log.d(TAG, "Connection to scanner " + deviceInfo.getScannerID() + " was successful.");
-    }
+    // public void notifyDeviceConnected(DCSScannerInfo deviceInfo) throws JSONException {
+    //     if (connectionCallBack == null)
+    //         return;
+    // }
 
     public void notifyDeviceDisconnected(int deviceId) throws JSONException {
         if (connectionCallBack == null)
@@ -268,7 +266,6 @@ public class ZebraScanner extends CordovaPlugin {
         connectionCallBack.sendPluginResult(message);
         connectionCallBack = null;
         subscriptionCallback = null;
-        Log.d(TAG, "Scanner " + deviceId + " was disconnected.");
     }
 
     public void notifyBarcodeReceived(String barcodeData, String barcodeType, int fromScannerId) throws JSONException {
@@ -323,7 +320,6 @@ public class ZebraScanner extends CordovaPlugin {
 
     // Convert native view to bitmap
     private Bitmap getBitmapFromView(BarCodeView view) {
-        Log.d(TAG, view.getWidth() + " " + view.getHeight());
         Bitmap converted = Bitmap.createBitmap(500, 100, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(converted);
         Drawable bgDrawable = view.getBackground();

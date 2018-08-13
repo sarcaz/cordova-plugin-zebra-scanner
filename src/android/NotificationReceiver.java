@@ -11,7 +11,7 @@ import land.cookie.cordova.plugin.zebrascanner.barcode.BarcodeTypes;
 import org.json.JSONException;
 
 public class NotificationReceiver implements IDcsSdkApiDelegate {
-    private static final String TAG = "clZebraScanner";
+    private static final String TAG = "CL_ZebraScanner";
     private ZebraScanner mScanner;
 
     NotificationReceiver(ZebraScanner scanner) {
@@ -41,11 +41,11 @@ public class NotificationReceiver implements IDcsSdkApiDelegate {
     @Override
     public void dcssdkEventCommunicationSessionEstablished(DCSScannerInfo scanner) {
         Log.d(TAG, "Communication Session Established");
-        try {
-            mScanner.notifyDeviceConnected(scanner);
-        } catch(JSONException err) {
-            Log.e(TAG, "ERROR notifying connected event.");
-        }
+        // try {
+        //     mScanner.notifyDeviceConnected(scanner);
+        // } catch(JSONException err) {
+        //     Log.e(TAG, "ERROR notifying connected event.");
+        // }
     }
 
     @Override
