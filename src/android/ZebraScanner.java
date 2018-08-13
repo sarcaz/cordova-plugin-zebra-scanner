@@ -148,7 +148,7 @@ public class ZebraScanner extends CordovaPlugin {
         callbackContext.success(barcode);
     }
 
-    private void connectAction(JSONArray params, CallbackContext callbackContext) {
+    private void connectAction(JSONArray params, CallbackContext callbackContext) throws JSONException {
         JSONObject param = params.optJSONObject(0);
         if (param == null) {
             callbackContext.error("Missing parameter");
