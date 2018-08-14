@@ -1,6 +1,6 @@
-let serviceName = 'ZebraScanner'
+const serviceName = 'ZebraScanner'
 
-let zebraScanner = {
+const zebraScanner = {
   // NOTE: Zebra has multiple bugs in their SDK so these 2 methods does not need to be used.
 
   // SDK will start scanning for device immediately after sdkHandler has been created.
