@@ -1,10 +1,22 @@
-# Zebra Barcode Scanner Plugin
+# Zebra Barcode Scanner Plugin [Android]
+This plugin allows you to communicate with Zebra scanners over bluetooth (possibly USB as well) on Android.
 
-## Beware: \[2018-08-10\] Android part is finished - documentation not yet.
-The plugin was changed to be usable over bluetooth. Android part is finished.
-However the documentation is not updated yet. Additionally I wasn't able to verify if USB scanners still work,
-because I only have RFD8500 rfid/barcode scanner which works over bluetooth
-(Connecting to rfid part of RFD8500 is done over bluetooth-serial plugin).
+## Requirements
+* Cordova 5.0.0 or higher
+* Android 4.1 or higher - target Android API 26
+
+## Limitations
+* iOS is not supported. It looks like I won't get more time allocated to develop iOS part.
+  However you can try this plugin: https://github.com/shanghai-tang/cordova-plugin-zebra-scanner
+
+## Warning
+I had to use SDK provided by Zebra and there are multiple bugs in it.
+* Calling any method will start scanning for bluetooth devices. There was no way around it. The SDK object starts scanning by itself when it is created.
+* There is no way to stop scanning for bluetooth devices. Calling stopScan() will stop the scan however only for few seconds, after that the scan will restart itself and it will keep repeating unless a scanner is connected or until plugin is destroyed.
+
+## Install
+### Cordova
+`cordova plugin add https://github.com/PreciousBiscuit/cordova-plugin-zebra-scanner.git`
 
 ## Overview
 These bluetooth barcode scanners are supported:
@@ -25,10 +37,6 @@ These USB barcode scanners should be supported as well, however I cannot test it
 • DS6878 and Presentation Cradle
 • MP6210 (CSS + Scale) + EAS (Sensormatic)
 ```
-
-## Setup
-### Cordova CLI
-`cordova plugin add https://github.com/PreciousBiscuit/cordova-plugin-zebra-scanner.git`.
 
 ## Implementation
 TODO
