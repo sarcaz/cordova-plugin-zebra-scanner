@@ -11,8 +11,11 @@ This plugin allows you to communicate with Zebra scanners over bluetooth (possib
 
 ## Warning
 I had to use SDK provided by Zebra and there are multiple bugs in it.
-* Calling any method will start scanning for bluetooth devices. There was no way around it. The SDK object starts scanning by itself when it is created.
-* There is no way to stop scanning for bluetooth devices. Calling stopScan() will stop the scan however only for few seconds, after that the scan will restart itself and it will keep repeating unless a scanner is connected or until plugin is destroyed.
+* Calling any method will start scanning for bluetooth devices. There was no way around it.
+  The SDK object starts scanning by itself when it is created.
+* There is no way to stop scanning for bluetooth devices. Calling stopScan() will stop the scan however only for few
+  seconds, after that the scan will restart itself and it will keep repeating that unless a scanner is connected or
+  until plugin is destroyed.
 
 ## Install
 ### Cordova
