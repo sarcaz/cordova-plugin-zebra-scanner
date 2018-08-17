@@ -115,7 +115,7 @@ public class ZebraScanner extends CordovaPlugin {
         Log.d(TAG, "Stopping scan.");
         sdkHandler.dcssdkStopScanningDevices();
 
-        callbackContext.success("Scanning was stopped.");
+        callbackContext.success("ok");
         PluginResult message = createStatusMessage("scanStop", false);
         scanCallBack.sendPluginResult(message);
         scanCallBack = null;
