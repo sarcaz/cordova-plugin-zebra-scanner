@@ -42,19 +42,23 @@ These USB barcode scanners should be supported as well, however I cannot test it
 ```
 
 ## Methods
-* [startScan](#startScan)
-* [stopScan](#stopScan)
-* [getAvailableDevices](#getAvailableDevices)
-* [getActiveDevices](#getActiveDevices)
-* [getPairingBarcode](#getPairingBarcode)
-* [connect](#connect)
-* [disconnect](#disconnect)
-* [subscribe](#subscribe)
-* [unsubscribe](#unsubscribe)
+* [zebraScanner.startScan](#startscan)
+* [zebraScanner.stopScan](#stopscan)
+* [zebraScanner.getAvailableDevices](#getavailabledevices)
+* [zebraScanner.getActiveDevices](#getactivedevices)
+* [zebraScanner.getPairingBarcode](#getpairingbarcode)
+* [zebraScanner.connect](#connect)
+* [zebraScanner.disconnect](#disconnect)
+* [zebraScanner.subscribe](#subscribe)
+* [zebraScanner.unsubscribe](#unsubscribe)
 
 ### startScan
-Start scanning for bluetooth (possibly USB connected) devices. Scanning is expensive so call stopScan() as soon as
-possible [see [Warning](#Warning) above]. The method returns all discovered and paired devices.
+Starts scanning for bluetooth (possibly USB connected) devices. Scanning is expensive so call stopScan() as soon as
+possible [see [Warning](#warning) above]. The method returns all discovered and paired devices.
+
+```javascript
+zebraScanner.startScan(successCallback, errorCallback)
+```
 
 ##### Success
 ```
@@ -75,43 +79,99 @@ possible [see [Warning](#Warning) above]. The method returns all discovered and 
   * serialNumber - Available for status "deviceFound"
 
 ##### Errors
-* "Scanning is already in a progress." -- startScan() was already called but stopScan() was not.
+* "Scanning is already in a progress." -- startScan() was already called but stopScan() was not
 
 
 ### stopScan
-Stop scanning for bluetooth devices [see [Warning](#Warning) above].
+Stops scanning for bluetooth devices [see [Warning](#warning) above].
+
+```javascript
+zebraScanner.stopScan(successCallback, errorCallback)
+```
 
 ##### Success
-* "ok"
+"ok"
 
 ##### Errors
-* "Scanning was not in a progress." -- startScan() was not called.
+* "Scanning was not in a progress." -- startScan() was not called
 
 
 ### getAvailableDevices
+Returns all devices found by zebra SDK including paired devices.
+
+```javascript
+zebraScanner.getAvailableDevices(successCallback, errorCallback)
+```
 
 ##### Success
+An array of devices
+```
+[
+  "device": {
+    "id": <number>
+    "name": <string>
+    "model": <string>
+    "serialNumber": <string>
+  },
+  ...
+]
+```
 
 ##### Errors
+None
 
 
 ### getActiveDevices
+Returns all connected devices. Zebra SDK supports only one connection so this method returns maximum one device.
+
+```javascript
+zebraScanner.getActiveDevices(successCallback, errorCallback)
+```
 
 ##### Success
+An array of devices
+```
+[
+  "device": {
+    "id": <number>
+    "name": <string>
+    "model": <string>
+    "serialNumber": <string>
+  }
+]
+```
 
 ##### Errors
+None
 
 
 ### getPairingBarcode
+Returns barcode for pairing devices. The barcode is JPG encoded in base64.
+
+```javascript
+zebraScanner.getPairingBarcode(successCallback, errorCallback)
+```
 
 ##### Success
+A string with base64 encoded JPG
 
 ##### Errors
+None
 
 
 ### connect
 
+```javascript
+zebraScanner.connect(successCallback, errorCallback, params)
+```
+
 ##### Params
+```
+{
+  "deviceId": <number>
+}
+```
+* deviceId - ID of a device retrieved from methods startScan() or getAvailableDevices()
 
 ##### Success
 
@@ -120,7 +180,17 @@ Stop scanning for bluetooth devices [see [Warning](#Warning) above].
 
 ### disconnect
 
+```javascript
+zebraScanner.disconnect(successCallback, errorCallback, params)
+```
+
 ##### Params
+```
+{
+  "deviceId": <number>
+}
+```
+* deviceId - ID of a device retrieved from methods startScan() or getAvailableDevices()
 
 ##### Success
 
@@ -129,12 +199,20 @@ Stop scanning for bluetooth devices [see [Warning](#Warning) above].
 
 ### subscribe
 
+```javascript
+zebraScanner.subscribe(successCallback, errorCallback)
+```
+
 ##### Success
 
 ##### Errors
 
 
 ### unsubscribe
+
+```javascript
+zebraScanner.unsubscribe(successCallback, errorCallback)
+```
 
 ##### Success
 
