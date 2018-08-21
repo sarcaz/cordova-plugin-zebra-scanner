@@ -151,7 +151,7 @@ public class ZebraScanner extends CordovaPlugin {
     private void connectAction(JSONArray params, CallbackContext callbackContext) throws JSONException {
         JSONObject param = params.optJSONObject(0);
         if (param == null) {
-            callbackContext.error("Missing parameter");
+            callbackContext.error("Missing parameters");
             return;
         }
         int deviceId = param.optInt("deviceId");
@@ -173,11 +173,11 @@ public class ZebraScanner extends CordovaPlugin {
         }
         else {
             if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_NOT_AVAILABLE)
-                callbackContext.error("Scanner " + deviceId + " is not available.");
+                callbackContext.error("Scanner is not available.");
             else if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_ALREADY_ACTIVE)
-                callbackContext.error("Already connected to scanner " + deviceId + ".");
+                callbackContext.error("Already connected to a scanner.");
             else
-                callbackContext.error("Unable to connect to scanner " + deviceId + ".");
+                callbackContext.error("Unable to connect to a scanner.");
             Log.d(TAG, "Connection to scanner " + deviceId + " failed.");
         }
     }
@@ -201,11 +201,11 @@ public class ZebraScanner extends CordovaPlugin {
         }
         else {
             if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_NOT_AVAILABLE)
-                callbackContext.error("Scanner " + deviceId + " is not available.");
+                callbackContext.error("Scanner is not available.");
             else if (result == DCSSDKDefs.DCSSDK_RESULT.DCSSDK_RESULT_SCANNER_NOT_ACTIVE)
-                callbackContext.error("Never connected to scanner " + deviceId + ".");
+                callbackContext.error("Never connected to a scanner.");
             else
-                callbackContext.error("Unable to disconnect from scanner " + deviceId + ".");
+                callbackContext.error("Unable to disconnect from a scanner.");
             Log.d(TAG, "Connection to scanner " + deviceId + " failed.");
         }
     }
@@ -259,11 +259,10 @@ public class ZebraScanner extends CordovaPlugin {
         if (connectionCallBack == null)
             return;
 
-        JSONObject device = new JSONObject();
-        device.put("id", deviceId);
+        // JSONObject device = new JSONObject();
+        // device.put("id", deviceId);
 
-        PluginResult message = createStatusMessage("disconnected", "device", device, false);
-        connectionCallBack.sendPluginResult(message);
+        connectionCallBack.error("Disconnected")
         connectionCallBack = null;
         subscriptionCallback = null;
     }

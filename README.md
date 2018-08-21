@@ -1,5 +1,5 @@
 # Zebra Barcode Scanner Plugin [Android]
-This plugin allows you to communicate with Zebra scanners over bluetooth (possibly USB as well) on Android.
+This plugin allows you to communicate with Zebra scanners over bluetooth 2.0 (possibly USB as well) on Android.
 
 ## Requirements
 * Cordova 5.0.0 or higher
@@ -97,7 +97,8 @@ zebraScanner.stopScan(successCallback, errorCallback)
 
 
 ### getAvailableDevices
-Returns all devices found by zebra SDK including paired devices.
+Returns all bluetooth (possibly USB connected) devices found by Zebra SDK including paired devices.
+Zebra SDK searches for devices non-stop and stores all devices it had found. This method returns all stored devices.
 
 ```javascript
 zebraScanner.getAvailableDevices(successCallback, errorCallback)
@@ -160,6 +161,10 @@ None
 
 
 ### connect
+Connects to a device. The device needs to be found by Zebra SDK before it is possible to connect.
+Call getAvailableDevices() to check if the device was already found or use startScan() to search for it.
+It is possible to connect only to a single device. If a connection to a device is interrupted
+ errorCallback will be called with a message "Disconnected".
 
 ```javascript
 zebraScanner.connect(successCallback, errorCallback, params)
@@ -174,11 +179,26 @@ zebraScanner.connect(successCallback, errorCallback, params)
 * deviceId - ID of a device retrieved from methods startScan() or getAvailableDevices()
 
 ##### Success
+```
+{
+  "status": "connected"
+  "device": {
+    "id": <number>
+  }
+}
+```
 
 ##### Errors
+* "Missing parameters" -- Params were not provided
+* "Invalid parameter - deviceId" -- Parameter 'deviceId' was not a valid number
+* "Scanner is not available." -- Device was not found by Zebra SDK
+* "Already connected to a scanner." -- Connection to a scanner is already established
+* "Unable to connect to a scanner." -- Connection to a scanner was not successful
+* "Disconnected" -- Device was disconnected; either by calling disconnect() or by itself
 
 
 ### disconnect
+Disconnects from a device.
 
 ```javascript
 zebraScanner.disconnect(successCallback, errorCallback, params)
@@ -193,28 +213,50 @@ zebraScanner.disconnect(successCallback, errorCallback, params)
 * deviceId - ID of a device retrieved from methods startScan() or getAvailableDevices()
 
 ##### Success
+"ok"
 
 ##### Errors
+* "Missing parameters" -- Params were not provided
+* "Invalid parameter - deviceId" -- Parameter 'deviceId' was not a valid number
+* "Scanner is not available." -- Device was not found by Zebra SDK
+* "Never connected to a scanner." -- Connection to a scanner wasn't established
+* "Unable to disconnect from a scanner." -- Disconnect from a scanner was not successful
 
 
 ### subscribe
+Subscribes for a barcode events.
 
 ```javascript
 zebraScanner.subscribe(successCallback, errorCallback)
 ```
 
 ##### Success
+```
+{
+  "deviceId": <number>
+  "barcode": {
+    "type": <string>,
+    "data": <string>
+  }
+}
+```
+* barcode
+  * type -- Type of a barcode that was read; It could be for example 'QR Code', 'EAN 128', or 'Code 128'.
+  * data -- Data that was read from a barcode.
 
 ##### Errors
+* "No connected scanner" -- No device is connected
 
 
 ### unsubscribe
+Unsubscribes from a barcode events. Events are unsubscribed if a device is disconnected.
 
 ```javascript
 zebraScanner.unsubscribe(successCallback, errorCallback)
 ```
 
 ##### Success
+"ok"
 
 ##### Errors
-
+* "No active subscription" -- subscribe() was not called
