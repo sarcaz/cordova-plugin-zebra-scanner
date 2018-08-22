@@ -262,7 +262,7 @@ public class ZebraScanner extends CordovaPlugin {
         // JSONObject device = new JSONObject();
         // device.put("id", deviceId);
 
-        connectionCallBack.error("Disconnected")
+        connectionCallBack.error("Disconnected");
         connectionCallBack = null;
         subscriptionCallback = null;
     }
