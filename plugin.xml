@@ -20,10 +20,17 @@
     <clobbers target="zebraScanner" />
   </js-module>
 
+  <js-module src="www/zebrarfid.js" name="ZebraRFID">
+    <clobbers target="zebraRFID" />
+  </js-module>
+
   <platform name="android">
     <config-file target="res/xml/config.xml" parent="/widget">
       <feature name="ZebraScanner">
         <param name="android-package" value="land.cookie.cordova.plugin.zebrascanner.ZebraScanner" />
+      </feature>
+      <feature name="ZebraRFID">
+        <param name="android-package" value="land.cookie.cordova.plugin.zebrarfid.ZebraRFID" />
       </feature>
     </config-file>
 
@@ -33,13 +40,18 @@
     </config-file>
 
     <framework src="src/android/ZebraScanner.gradle" custom="true" type="gradleReference" />
-    <source-file src="src/android/libs/barcode_scanner_library_v2.3.2.0.aar" target-dir="libs/" />
+    <lib-file src="./src/android/libs/barcode_scanner_library_v2.5.12.0.aar"/>
+    <lib-file src="./src/android/libs/rfid_scanner_library_2.0.1.34.aar"/>
 
-    <source-file src="src/android/ZebraScanner.java"
-                 target-dir="src/land/cookie/cordova/plugin/zebrascanner" />
-    <source-file src="src/android/NotificationReceiver.java"
-                 target-dir="src/land/cookie/cordova/plugin/zebrascanner" />
-    <source-file src="src/android/barcode/BarcodeTypes.java"
-                 target-dir="src/land/cookie/cordova/plugin/zebrascanner/barcode" />
+    <!-- BARCODE -->
+    <source-file src="src/android/ZebraScanner.java" target-dir="src/land/cookie/cordova/plugin/zebrascanner" />
+    <source-file src="src/android/NotificationReceiver.java" target-dir="src/land/cookie/cordova/plugin/zebrascanner" />
+    <source-file src="src/android/barcode/BarcodeTypes.java" target-dir="src/land/cookie/cordova/plugin/zebrascanner/barcode" />
+
+    <!-- RFID -->
+    <source-file src="src/android/ZebraRFID.java"             target-dir="src/land/cookie/cordova/plugin/zebrarfid" />
+    <source-file src="src/android/rfid/RFIDHandler.java"      target-dir="src/land/cookie/cordova/plugin/zebrarfid/rfid" />
+    <source-file src="src/android/rfid/SDKResult.java"        target-dir="src/land/cookie/cordova/plugin/zebrarfid/rfid" />
+
   </platform>
 </plugin>

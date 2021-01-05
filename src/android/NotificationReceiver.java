@@ -29,6 +29,15 @@ public class NotificationReceiver implements IDcsSdkApiDelegate {
     }
 
     @Override
+    public void dcssdkEventBinaryData(byte[] binaryData, int fromScannerID) {
+        /**
+         * "Binary Data Event" notification is triggered when an active imaging
+         *  scanner captures Intelligent Document Capture(IDC) data in IDC Operating Mode.
+         */
+        Log.d(TAG, "dcssdkEventBinaryData");
+    }
+
+    @Override
     public void dcssdkEventScannerDisappeared(int scannerId) {
         Log.d(TAG, "Scanner Disappeared");
         try {

@@ -27,10 +27,9 @@ import com.zebra.scannercontrol.BarCodeView;
 public class ZebraScanner extends CordovaPlugin {
     private static final String TAG = "CL_ZebraScanner";
 
-    private SDKHandler sdkHandler; // Zebra SDK
+    private SDKHandler sdkHandler; // Zebra SDK - SDK does not support multiple connected devices.
     private NotificationReceiver notificationReceiver;
     private CallbackContext scanCallBack;
-    // SDK does not support multiple connected devices.
     private CallbackContext connectionCallBack;
     private CallbackContext subscriptionCallback;
 
