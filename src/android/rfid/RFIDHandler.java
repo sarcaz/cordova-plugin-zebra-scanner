@@ -141,6 +141,7 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler, RfidEventsLi
          // HANDHELD_TRIGGER_EVENT
          else if (eventType == STATUS_EVENT_TYPE.HANDHELD_TRIGGER_EVENT){
 
+            Log.d(TAG + " TRIGGER", event);
             Events.StatusEventData statusEventData = rfidStatusEvents.StatusEventData;
             HANDHELD_TRIGGER_EVENT_TYPE handheldEvent = statusEventData.HandheldTriggerEventData.getHandheldEvent();
 
@@ -270,7 +271,7 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler, RfidEventsLi
       }catch (OperationFailureException e) {
          e.printStackTrace();
          ConfigureReader(reader);
-         return new SDKResult(false, "riconnessione");
+         return new SDKResult(true, "riconnessione");
       }
    }
 
@@ -332,18 +333,23 @@ public class RFIDHandler implements Readers.RFIDReaderEventHandler, RfidEventsLi
             reader.Config.setStartTrigger(triggerInfo.StartTrigger);
             reader.Config.setStopTrigger(triggerInfo.StopTrigger);
 
-         } catch (InvalidUsageException | OperationFailureException e) {
-            e.printStackTrace();
-
          }
+         catch (InvalidUsageException | OperationFailureException e) {
+            e.printStackTrace();
+         }
+      }else{
+         Log.d(TAG, "Dispositivo non connesso");
       }
    }
 
    private void startScan() {
       try {
+         Log.d(ZebraRFID.TAG, " startScan");
          this.connectedReader.Actions.Inventory.perform();
          this.inScan = true;
+
       } catch (InvalidUsageException | OperationFailureException e) {
+         Log.e(ZebraRFID.TAG, " ECCEZIONE ");
          e.printStackTrace();
       }
    }
