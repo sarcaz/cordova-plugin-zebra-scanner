@@ -131,8 +131,10 @@ public class ZebraRFID extends CordovaPlugin {
         this.sdkHandler.setCanScan(false);
 
         PluginResult message = new PluginResult(PluginResult.Status.OK, "stop_scan");
-        this.onTagCallback.sendPluginResult(message);
-        this.onTagCallback = null;
+        if(this.onTagCallback != null){
+            this.onTagCallback.sendPluginResult(message);
+            this.onTagCallback = null;
+        }
 
         callbackContext.success(SDKResult.successResult("ok"));
     }
@@ -177,6 +179,7 @@ public class ZebraRFID extends CordovaPlugin {
 
         if(this.connectedReader != null){
             SDKResult res = new SDKResult(true, "Device already connected");
+            res.code = "device_already_connected";
             callbackContext.error(res.toJson());
             return;
         }
@@ -224,7 +227,7 @@ public class ZebraRFID extends CordovaPlugin {
     private void getConnectedDeviceAction(CallbackContext callbackContext) {
         Log.d(TAG, "getConnectedDeviceAction");
         if(this.connectedReader == null){
-            callbackContext.error(SDKResult.errorResult("Device Not connected"));
+            callbackContext.error(SDKResult.errorResult("Device Not connected", "not_connected"));
             return;
         }
         try {
