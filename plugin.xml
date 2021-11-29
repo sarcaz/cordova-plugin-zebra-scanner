@@ -54,4 +54,5 @@
     <source-file src="src/android/rfid/SDKResult.java"        target-dir="src/land/cookie/cordova/plugin/zebrarfid/rfid" />
 
   </platform>
+
 </plugin>
