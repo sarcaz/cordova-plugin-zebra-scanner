@@ -34,11 +34,11 @@
       </feature>
     </config-file>
 
-    <config-file target="AndroidManifest.xml" parent="/manifest" mode="merge">
+<!--    <config-file target="AndroidManifest.xml" parent="/manifest" mode="merge">
       <uses-permission android:name="android.permission.BLUETOOTH" />
       <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
     </config-file>
-
+-->
     <framework src="src/android/ZebraScanner.gradle" custom="true" type="gradleReference" />
     <lib-file src="./src/android/libs/barcode_scanner_library_v2.6.10.0-release.aar"/>
     <lib-file src="./src/android/libs/rfid_scanner_library_2.0.1.34.aar"/>
